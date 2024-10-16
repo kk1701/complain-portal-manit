@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose'
+import { model, Schema } from 'mongoose';
 
 const complainSchema = new Schema({
     studentID: {
@@ -11,11 +11,12 @@ const complainSchema = new Schema({
         trim: true
     },
     hostelNumber: {
-        type: Intl,
+        type: Number,
         required: [true, "Hostel number is required!"],
     },
     complainType: {
-        type: String
+        type: String,
+        trim: true
     },
     complainDescription: {
         type: String,
@@ -23,7 +24,8 @@ const complainSchema = new Schema({
         required: [true, "Description is required!"]
     },
     dateReported: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     status: {
         type: String,
@@ -31,18 +33,28 @@ const complainSchema = new Schema({
         default: 'Pending'
     },
     assignedTo: {
-        type: String
+        type: String,
+        trim: true
     },
     attachments: {
-        type: String
+        type: String,
+        validate: {
+            validator: function(v) {
+                return /^https?:\/\/.+$/.test(v); // Example URL validation
+            },
+            message: props => `${props.value} is not a valid URL!`
+        }
     },
     lastUpdated: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
 }, {
     timestamps: true
-})
+});
 
-const Complains = new model('Complains', complainSchema)
+complainSchema.index({ studentID: 1 }); // Adding an index on studentID
 
-export default Complains;
+const Complaints = model('Complaints', complainSchema);
+
+export default Complaints;
