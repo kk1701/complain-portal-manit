@@ -1,48 +1,60 @@
-import { model, Schema } from 'mongoose'
+import { model, Schema } from 'mongoose';
 
 const complainSchema = new Schema({
-    // studentID: {
-    //     type: String,
-    //     required: [true, "Student ID is required!"],
-    // },
-    // studentName: {
-    //     type: String,
-    //     required: [true, "Student name is required!"],
-    //     trim: true
-    // },
-    // hostelNumber: {
-    //     type: Intl,
-    //     required: [true, "Hostel number is required!"],
-    // },
+    /*studentID: {
+        type: String,
+        required: [true, "Student ID is required!"],
+    },
+    studentName: {
+        type: String,
+        required: [true, "Student name is required!"],
+        trim: true
+    },
+    hostelNumber: {
+        type: Intl,
+        required: [true, "Hostel number is required!"],
+    },*/
     complainType: {
-        type: String
+        type: String,
+        trim: true
     },
     complainDescription: {
         type: String,
         trim: true,
         // required: [true, "Description is required!"]
     },
-    dateReported: {
-        type: Date,
-    },
-    status: {
-        type: String,
-        enum: ['Pending', 'Resolved'],
-        default: 'Pending'
-    },
-    assignedTo: {
-        type: String
-    },
+    // dateReported: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // status: {
+    //     type: String,
+    //     enum: ['Pending', 'Resolved'],
+    //     default: 'Pending'
+    // },
+    // assignedTo: {
+    //     type: String,
+    //     trim: true
+    // },
     attachments: {
-        type: String
+        type: String,
+        // validate: {
+        //     validator: function(v) {
+        //         return /^https?:\/\/.+$/.test(v); // Example URL validation
+        //     },
+        //     message: props => `${props.value} is not a valid URL!`
+        // }
     },
-    lastUpdated: {
-        type: Date
-    },
+    // lastUpdated: {
+    //     type: Date,
+    //     default: Date.now
+    // },
 }, {
     timestamps: true
-})
+});
 
-const Complains = new model('Complains', complainSchema)
+complainSchema.index({ studentID: 1 }); // Adding an index on studentID
 
-export default Complains;
+const Complaints = model('Complaints', complainSchema);
+
+export default Complaints;
