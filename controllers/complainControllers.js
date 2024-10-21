@@ -1,11 +1,30 @@
-import Complains from "../models/complainModel.js";
-
-const cookieOptions = {
-    secret: true,
-    maxAge: 1*24*60*60*1000,   //1 day
-    httpOnly: true
-}
+import Complaints from "../models/complainModel.js";
+import appError from "../utils/appError.js";
 
 const registerComplain = async (req, res, next) => {
-    const { studentID, studentName, hostelNumber, complainType, complainDescription, }
+    const { complainType, complainDescription, attachments } = req.body
+
+    console.log(req.body);
+    if(complainType == null || complainDescription == null || attachments == null){
+        return next(new appError('Please enter all details!', 400))
+    }
+
+    const complain = await Complaints.create({
+        complainType,
+        complainDescription,
+        attachments
+    })
+
+    if(!complain){
+        return next(new appError('Complaint registration failed, please try again!', 400))
+    }
+
+    await complain.save()
+
+    res.status(200).json({
+        success: true,
+        message: "Complain registered successfully!"
+    })
 }
+
+export default registerComplain
