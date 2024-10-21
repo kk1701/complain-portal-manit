@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 
 const complainSchema = new Schema({
-    /*studentID: {
+    scholarNumber: {
         type: String,
         required: [true, "Student ID is required!"],
     },
