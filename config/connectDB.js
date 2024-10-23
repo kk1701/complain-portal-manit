@@ -3,16 +3,16 @@ import mongoose from "mongoose";
 mongoose.set('strictQuery', false)
 
 const connectToDB = async () => {
-    try{
+    try {
         const connection = await mongoose.connect(process.env.MONGO_URI)
 
-        if(connection){
+        if (connection) {
             console.log("Connected to DB: ", connection.host);
         }
-    } catch(error){
+    } catch (error) {
         console.log(error);
-        process.exit(1)
+        process.exit(1);
     }
 }
 
-export default connectToDB
+export default connectToDB;

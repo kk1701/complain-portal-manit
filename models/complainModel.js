@@ -13,7 +13,7 @@ const complainSchema = new Schema({
     hostelNumber: {
         type: Intl,
         required: [true, "Hostel number is required!"],
-    },*/
+    },
     complainType: {
         type: String,
         trim: true
@@ -21,39 +21,15 @@ const complainSchema = new Schema({
     complainDescription: {
         type: String,
         trim: true,
-        // required: [true, "Description is required!"]
     },
-    // dateReported: {
-    //     type: Date,
-    //     default: Date.now
-    // },
-    // status: {
-    //     type: String,
-    //     enum: ['Pending', 'Resolved'],
-    //     default: 'Pending'
-    // },
-    // assignedTo: {
-    //     type: String,
-    //     trim: true
-    // },
     attachments: {
-        type: String,
-        // validate: {
-        //     validator: function(v) {
-        //         return /^https?:\/\/.+$/.test(v); // Example URL validation
-        //     },
-        //     message: props => `${props.value} is not a valid URL!`
-        // }
+        type: [String],
     },
-    // lastUpdated: {
-    //     type: Date,
-    //     default: Date.now
-    // },
 }, {
     timestamps: true
 });
 
-complainSchema.index({ studentID: 1 }); // Adding an index on studentID
+complainSchema.index({ studentID: 1 });
 
 const Complaints = model('Complaints', complainSchema);
 
