@@ -19,7 +19,7 @@ const getProfileDetails = async (req, res, next) => {
     try {
         // The scholar number would be extracted and added to the request by the protect route which will check the validity of the token 
         //The request will contain the field sn which is Scholar Number
-        
+
         let scholarNumber = req.sn;
 
         // Sanitize scholar number

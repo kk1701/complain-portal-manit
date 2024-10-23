@@ -8,22 +8,21 @@ let client;
 
 
 const initializeLdapClient = () => {
-     client = ldap.createClient({
-        url:process.env.LDAP_URL
-     });
+  client = ldap.createClient({
+    url: process.env.LDAP_URL
+  });
 
-     client.bind(process.env.LDAP_BIND_DN,process.env.LDAP_BIND_PASSWORD,(err)=>{
-       if(err)
-       {
-         console.error("LDAP bind failed ! ", err);
-         throw new appError("LDAP bind failed !",500);
-       }
-       console.log('LDAP bind successful');
-     });
-     client.on("error",(err)=>{
-         console.error("LDAP client error",err);
-         initializeLdapClient();
-     })
+  client.bind(process.env.LDAP_BIND_DN, process.env.LDAP_BIND_PASSWORD, (err) => {
+    if (err) {
+      console.error("LDAP bind failed ! ", err);
+      throw new appError("LDAP bind failed !", 500);
+    }
+    console.log('LDAP bind successful');
+  });
+  client.on("error", (err) => {
+    console.error("LDAP client error", err);
+    initializeLdapClient();
+  })
 
 }
 

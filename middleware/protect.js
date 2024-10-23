@@ -4,7 +4,7 @@ const appError = require('../utils/appError');
 
 //The protect is middleware function to protect the routes in the backend such that once the user is authenticated the request will contain the jwt cookie
 //This cookie is neeeded to get the acesses to the protected routes
-//Hence the protect function will check if the jwt cookie is valid or invalid 
+ 
 const protect = async (req, res, next) => {
     try {
         // Extract the token from the req

@@ -5,7 +5,7 @@ const registerComplain = async (req, res, next) => {
     const { complainType, complainDescription, attachments } = req.body
 
     console.log(req.body);
-    if(complainType == null || complainDescription == null || attachments == null){
+    if (complainType == null || complainDescription == null || attachments == null) {
         return next(new appError('Please enter all details!', 400))
     }
 
@@ -15,7 +15,7 @@ const registerComplain = async (req, res, next) => {
         attachments
     })
 
-    if(!complain){
+    if (!complain) {
         return next(new appError('Complaint registration failed, please try again!', 400))
     }
 
@@ -27,4 +27,4 @@ const registerComplain = async (req, res, next) => {
     })
 }
 
-export default registerComplain
+export default registerComplain;

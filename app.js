@@ -11,5 +11,6 @@ app.use('/ping', (req, res) => {
 });
 
 app.use('/complain', complainRoutes);
+app.use('/profile', profileRoutes);
 
 export default app;
