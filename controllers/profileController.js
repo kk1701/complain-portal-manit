@@ -1,78 +1,116 @@
 import Complaints from "../models/complainModel.js";
-import { client } from '../config/ldapDB.js';
 import appError from "../utils/appError.js";
-import validator from 'validator';
-import dotenv from 'dotenv';
+import validator from "validator";
+import dotenv from "dotenv";
+import ldap from "ldapjs";
+
 dotenv.config();
 
-// We will be having the connection to the LDAP already. It will fetch the details of the user like:
-/*
-    - Scholar number, student name, hostel number, room number (if present), email id, phone number.
-    - The scholar number will be the unique identifier for the student.
-    - Also, we would be fetching the number of complaints registered by the student and how many of them got resolved, how many not got resolved.
-    - The student's scholar number would be included in the request as the HTTP-only cookie which has the JWT token generated when the user logs in.
-    - Ensure that the JWT token is securely stored and transmitted using HTTPS to prevent interception.
-    - Validate and sanitize all inputs to prevent injection attacks.
-   
-*/
-// The profile controller will have the following functions
-
 const getProfileDetails = async (req, res, next) => {
-    try {
-        // The scholar number would be extracted and added to the request by the protect route which will check the validity of the token 
-        //The request will contain the field sn which is Scholar Number
+	try {
+		// Extract the scholar number set by the auth middleware
+		const scholarNumber = validator.escape(req.sn);
 
-        let scholarNumber = req.sn;
+		// Create LDAP client
+		const client = ldap.createClient({
+			url: process.env.LDAP_URL || "ldaps://localhost:389",
+		});
 
-        // Sanitize scholar number
-        scholarNumber = validator.escape(scholarNumber);
+		const bindDn = process.env.LDAP_BIND_DN || "cn=admin,dc=dev,dc=com";
+		const bindPassword = process.env.LDAP_BIND_PASSWORD || "yoga";
 
-        // Fetch user details from LDAP
-        const opts = {
-            filter: `(scholarNumber=${scholarNumber})`,
-            scope: 'sub'
-        };
+		// Bind to the LDAP server
+		client.bind(bindDn, bindPassword, (err) => {
+			if (err) {
+				console.error("LDAP bind failed!", err);
+				return next(new appError("LDAP authentication failed!", 500));
+			}
 
-        client.search('ou=users,dc=example,dc=com', opts, (err, ldapRes) => {
-            if (err) {
-                return next(new appError('LDAP search failed!', 500));
-            }
+			const opts = {
+				filter: `(uid=${scholarNumber})`,
+				scope: "sub",
+				attributes: [
+					"cn",
+					"mail",
+					"uid",
+					"roomNumber",
+					"mobile",
+					"departmentNumber",
+				],
+			};
 
-            let user = null;
-            ldapRes.on('searchEntry', (entry) => {
-                user = entry.object;
-            });
+			// Search for user data
+			client.search(
+				process.env.LDAP_BASE_DN || "dc=dev,dc=com",
+				opts,
+				(err, searchRes) => {
+					if (err) {
+						console.error("Search error:", err);
+						client.unbind();
+						return next(new appError("Error searching for user data!", 500));
+					}
 
-            ldapRes.on('end', async () => {
-                if (!user) {
-                    return next(new appError('User not found!', 404));
-                }
+					let userData = null;
 
-                // Fetch complaints from MongoDB
-                const complaints = await Complaints.find({ scholarNumber });
+					// Handle search entries
+					searchRes.on("searchEntry", (entry) => {
+						userData = entry.object; // Capture the user data
+						console.log("User data found:", userData);
+					});
 
-                // Count resolved and unresolved complaints
-                const resolvedComplaints = complaints.filter(c => c.status === 'resolved').length;
-                const unresolvedComplaints = complaints.filter(c => c.status !== 'resolved').length;
+					// Handle search end
+					searchRes.on("end", async (result) => {
+						console.log("Search ended with result:", result.status);
+						client.unbind();
 
-                // Send response
-                res.status(200).json({
-                    success: true,
-                    data: {
-                        user,
-                        complaints: {
-                            total: complaints.length,
-                            resolved: resolvedComplaints,
-                            unresolved: unresolvedComplaints
-                        }
-                    }
-                });
-            });
-        });
-    } catch (error) {
-        console.log(error);
-        return next(new appError('Internal server error!', 500));
-    }
+						if (result.status !== 0 || !userData) {
+							return next(new appError("User not found!", 404));
+						}
+
+						// Fetch complaints data
+						const complaints = await Complaints.find({
+							scholarNumber: sanitizedScholarNumber,
+						});
+
+						// Process complaints data
+						const resolvedComplaints = complaints.filter(
+							(complaint) => complaint.status === "resolved"
+						).length;
+						const unresolvedComplaints = complaints.filter(
+							(complaint) => complaint.status !== "resolved"
+						).length;
+
+						// Send response
+						res.status(200).json({
+							success: true,
+							data: {
+								user: {
+									...userData,
+									complaintsRegistered: complaints.length,
+									complaintsResolved: resolvedComplaints,
+									complaintsUnresolved: unresolvedComplaints,
+								},
+							},
+						});
+					});
+
+					// Handle search errors
+					searchRes.on("error", (error) => {
+						console.error("Search error:", error);
+						client.unbind();
+						return next(
+							new appError("Error occurred during LDAP search!", 500)
+						);
+					});
+				}
+			);
+
+			console.log("LDAP bind successful");
+		});
+	} catch (error) {
+		console.error("Internal error:", error);
+		return next(new appError("Internal server error!", 500));
+	}
 };
 
-export { getProfileDetails};
+export { getProfileDetails };
