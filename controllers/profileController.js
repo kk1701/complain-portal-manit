@@ -2,6 +2,8 @@ import Complaints from "../models/complainModel.js";
 import { client } from '../config/ldapDB.js';
 import appError from "../utils/appError.js";
 import validator from 'validator';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // We will be having the connection to the LDAP already. It will fetch the details of the user like:
 /*
@@ -73,4 +75,4 @@ const getProfileDetails = async (req, res, next) => {
     }
 };
 
-export default getProfileDetails;
+export { getProfileDetails};

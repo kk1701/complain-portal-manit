@@ -1,4 +1,4 @@
-const csrf = require('csurf');
+import csrf from 'csurf';
 //  Handles the core functionality of CSRF protection by generating and validating tokens.
 
 const csrfProtection = csrf({

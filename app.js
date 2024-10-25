@@ -6,6 +6,8 @@ import profileRoutes from './routes/profileRoutes.js';
 import csrfProtection from './utils/csrf.js';
 import csrfMiddleware from './middleware/csrfMiddleware.js';
 import appError from './utils/appError.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 

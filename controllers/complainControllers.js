@@ -1,6 +1,7 @@
 import Complaints from "../models/complainModel.js";
 import appError from "../utils/appError.js";
-
+import dotenv from 'dotenv';
+dotenv.config();
 const registerComplain = async (req, res, next) => {
     const { complainType, complainDescription, attachments } = req.body
 

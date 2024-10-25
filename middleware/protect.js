@@ -1,10 +1,11 @@
-const jwt = require('jsonwebtoken');
-const appError = require('../utils/appError');
+import jwt from 'jsonwebtoken';
+import appError from '../utils/appError.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
+// The protect is middleware function to protect the routes in the backend such that once the user is authenticated the request will contain the jwt cookie
+// This cookie is needed to get the access to the protected routes
 
-//The protect is middleware function to protect the routes in the backend such that once the user is authenticated the request will contain the jwt cookie
-//This cookie is neeeded to get the acesses to the protected routes
- 
 const protect = async (req, res, next) => {
     try {
         // Extract the token from the req
@@ -18,15 +19,13 @@ const protect = async (req, res, next) => {
         if (!decoded) {
             return next(new appError('Invalid token. Please log in again!', 401));
         }
-        
-
 
         // Grant access to protected route
-        req.sn = decoded.scholarNumber; //Attach the scholarnumber of the student to the request
+        req.sn = decoded.scholarNumber; // Attach the scholar number of the student to the request
         next();
     } catch (err) {
         return next(new appError('Invalid token. Please log in again!', 401));
     }
 };
 
-module.exports = protect;
+export { protect };
