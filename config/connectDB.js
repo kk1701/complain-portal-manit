@@ -6,14 +6,14 @@ dotenv.config();
 
 const connectToDB = async () => {
     try {
-        const connection = await mongoose.connect(process.env.MONGO_URI)
+        const client = await mongoose.connect(process.env.MONGO_URI)
 
-        if (connection) {
-            console.log("Connected to DB: ", connection.host);
+        if (client) {
+            console.log("Connected to DB: ", client.connection.host);
         }
     } catch (error) {
         console.log(error);
-        process.exit(1);
+        
     }
 }
 
