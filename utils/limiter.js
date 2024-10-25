@@ -7,4 +7,4 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 
-module.exports = limiter;
+export default limiter;
