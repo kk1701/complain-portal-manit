@@ -3,6 +3,6 @@ import { getProfileDetails } from "../controllers/profileController.js";
 import { protect } from "../middleware/protect.js";
 const router = Router();
 
-router.get("/",protect,getProfileDetails);// Should be protected
+router.get("/",protect,getProfileDetails);
 
 export default router;
