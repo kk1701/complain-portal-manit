@@ -6,6 +6,7 @@ import profileRoutes from './routes/profileRoutes.js';
 import csrfProtection from './utils/csrf.js';
 import csrfMiddleware from './middleware/csrfMiddleware.js';
 import appError from './utils/appError.js';
+import loginRoute from './routes/loginRoutes.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/ping', (req, res) => {
 // Routes
 app.use('/complain', complainRoutes);
 app.use('/profile', profileRoutes);
+app.use("/login",loginRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
