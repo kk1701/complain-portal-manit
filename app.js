@@ -6,14 +6,16 @@ import profileRoutes from './routes/profileRoutes.js';
 import csrfProtection from './utils/csrf.js';
 import csrfMiddleware from './middleware/csrfMiddleware.js';
 import appError from './utils/appError.js';
-import loginRoute from './routes/loginRoutes.js';
+import loginRoutes from './routes/loginRoutes.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
 
-app.use(helmet());
+
+
 app.use(express.json());
+app.use(helmet());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,7 +31,7 @@ app.use('/ping', (req, res) => {
 // Routes
 app.use('/complain', complainRoutes);
 app.use('/profile', profileRoutes);
-app.use("/login",loginRoute);
+app.use("/login",loginRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

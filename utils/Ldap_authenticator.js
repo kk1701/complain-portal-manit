@@ -2,32 +2,34 @@ import ldap from 'ldapjs';
 import dotenv from 'dotenv';
 dotenv.config();
 
-class Ldap_authenticator {
+class LdapAuthenticator {
     constructor(baseDN) {
         this.baseDN = baseDN;
     }
 
-    authenticate(username, password) {
+    async authenticate(username, password) {
         const client = ldap.createClient({
             url: process.env.LDAP_URL || "ldaps://localhost:389",
+            tlsOptions: { rejectUnauthorized: false } // Only use this if your LDAP uses a self-signed cert in dev
         });
 
-        const userdn = `uid=${username},${this.baseDN}`;
+        // Construct user DN dynamically
+        const userDN = `cn=${username},ou=Students,${this.baseDN}`;
 
         return new Promise((resolve, reject) => {
-            client.bind(userdn, password, (err) => {
+            client.bind(userDN, "yoga" , (err) => {
                 if (err) {
-                    console.error("Bind error:", err);
-                    client.unbind();
-                    return resolve(false); // Resolve false for failure
+                    console.error("Bind error:", err.message);
+                    client.unbind(); // Always unbind to clean up
+                    return resolve(false); // Authentication failed
                 }
 
                 console.log("Authentication successful");
-                client.unbind();
-                return resolve(true); // Resolve true for success
+                client.unbind(); // Unbind after authentication
+                return resolve(true); // Authentication successful
             });
         });
     }
 }
 
-export default Ldap_authenticator;
+export default LdapAuthenticator;

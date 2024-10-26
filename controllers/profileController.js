@@ -10,7 +10,7 @@ const getProfileDetails = async (req, res, next) => {
 	try {
 		// Extract the scholar number set by the auth middleware
 		const scholarNumber = validator.escape(req.sn);
-
+        
 		// Create LDAP client
 		const client = ldap.createClient({
 			url: process.env.LDAP_URL || "ldaps://localhost:389",
@@ -25,23 +25,19 @@ const getProfileDetails = async (req, res, next) => {
 				console.error("LDAP bind failed!", err);
 				return next(new appError("LDAP authentication failed!", 500));
 			}
-
+            console.log("Intiated searching for the scholar number : ",scholarNumber);
 			const opts = {
-				filter: `(uid=${scholarNumber})`,
+				filter: `(cn=${scholarNumber})`,
 				scope: "sub",
 				attributes: [
 					"cn",
-					"mail",
-					"uid",
-					"roomNumber",
-					"mobile",
-					"departmentNumber",
+					"sn",
 				],
 			};
 
 			// Search for user data
 			client.search(
-				process.env.LDAP_BASE_DN || "dc=dev,dc=com",
+				 "ou=Students,dc=dev,dc=com",
 				opts,
 				(err, searchRes) => {
 					if (err) {
