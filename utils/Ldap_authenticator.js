@@ -14,7 +14,7 @@ class LdapAuthenticator {
         });
 
         // Construct user DN dynamically
-        const userDN = `cn=${username},ou=Students,${this.baseDN}`;
+        const userDN = `uid=${username},ou=Students,${this.baseDN}`;
 
         return new Promise((resolve, reject) => {
             client.bind(userDN, "yoga" , (err) => {
