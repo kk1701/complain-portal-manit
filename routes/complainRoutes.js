@@ -11,7 +11,7 @@ router.post("/register", protect, registerComplain);
 //Read
 router.get("/get-complaints", protect, getComplaints);
 //Update
-router.post("/update-complints", protect, updateComplaints);
+router.post("/update-complaints", protect, updateComplaints);
 //Delete
 router.delete("/delete-complaints", protect, deleteComplaints);
 

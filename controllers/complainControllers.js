@@ -60,8 +60,8 @@ export const getComplaints = async (req,res,next) => {
 
 
 //It receives the array of modified compliants data along with their compliant datas and we perform the bulk update
-export const updateComplaints = async (req,res,next) => {
-    try{
+export const updateComplaints = async (req, res, next) => {
+    try {
         const { updates } = req.body;
 
         if (!Array.isArray(updates) || updates.length === 0) {
@@ -69,24 +69,16 @@ export const updateComplaints = async (req,res,next) => {
         }
 
         const bulkUpdatePromises = updates.map(update => {
-            const { complainId, complainType, complainDescription, attachments, hostelNumber, studentName, scholarNumber, room } = update;
+            const { complainId, ...updateFields } = update;
 
             if (!complainId) {
-            throw new appError("Complain ID is required for each update!", 400);
+                throw new appError("Complain ID is required for each update!", 400);
             }
 
             return Complaints.findByIdAndUpdate(
-            complainId,
-            {
-                complainType,
-                complainDescription,
-                attachments,
-                hostelNumber,
-                studentName,
-                scholarNumber,
-                room
-            },
-            { new: true }
+                complainId,
+                { $set: updateFields },
+                { new: true }
             );
         });
 
@@ -97,9 +89,8 @@ export const updateComplaints = async (req,res,next) => {
             message: "Complaints updated successfully!",
             data: updatedComplaints
         });
-        
-    }catch(err)
-    {
+
+    } catch (err) {
         next(new appError("Internal server error!", 500));
     }
 }
@@ -107,8 +98,8 @@ export const updateComplaints = async (req,res,next) => {
 
 export const deleteComplaints = async (req, res, next) => {
     try {
-        const { complainId } = req.params;
-
+        const {complainId}  = req.query;
+        console.log("Complaint ID:", complainId);
         if (!complainId) {
             return next(new appError("Complain ID is required!", 400));
         }
