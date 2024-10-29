@@ -25,6 +25,15 @@ const complainSchema = new Schema({
     attachments: {
         type: [String],
     },
+    room :{
+        type : String,
+        trim : true
+    },
+    status: {
+        type: String,
+        default: "Pending",
+        enum: ["Pending", "Resolved"],
+    },
 }, {
     timestamps: true
 });
