@@ -9,7 +9,7 @@ dotenv.config();
 const protect = async (req, res, next) => {
 	try {
 		// Extract the token from the req
-		const token = req.cookies.jwt; // Corrected from req.cookie.jwt to req.cookies.jwt
+		const token = req.cookies.jwt;
 		console.log("Token:", token);
 		if (!token) {
 			return next(new appError("You are not logged in!", 401));
