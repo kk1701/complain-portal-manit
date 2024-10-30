@@ -7,6 +7,7 @@ import csrfProtection from './utils/csrf.js';
 import csrfMiddleware from './middleware/csrfMiddleware.js';
 import appError from './utils/appError.js';
 import loginRoutes from './routes/loginRoutes.js';
+import logoutRoutes from './routes/logoutRoutes.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -32,7 +33,7 @@ app.use('/ping', (req, res) => {
 app.use('/complain', complainRoutes);
 app.use('/profile', profileRoutes);
 app.use("/login",loginRoutes);
-
+app.use("/logout",logoutRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
