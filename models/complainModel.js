@@ -1,6 +1,8 @@
 // This for the hostel wise complaints
+// This for the hostel wise complaints
 import { model, Schema } from 'mongoose';
 
+const hostelComplaint = new Schema({
 const hostelComplaint = new Schema({
     scholarNumber: {
         type: String,
@@ -13,10 +15,13 @@ const hostelComplaint = new Schema({
     },
     hostelNumber: {
         type: String,
+        type: String,
         required: [true, "Hostel number is required!"],
     },
     complainType: {
         type: String,
+        trim: true,
+        enum: ["Maintenance", "Hygiene", "Security", "Mess", "Bathroom", "Room", "Noise","Other"]
         trim: true,
         enum: ["Maintenance", "Hygiene", "Security", "Mess", "Bathroom", "Room", "Noise","Other"]
     },
@@ -30,12 +35,20 @@ const hostelComplaint = new Schema({
     room: {
         type: String,
         trim: true
+    room: {
+        type: String,
+        trim: true
     },
     status: {
         type: String,
         default: "Pending",
         enum: ["Pending", "Resolved"],
     },
+    readStatus:{ 
+        type: String,
+        default: "Not viewed",
+        enum: ["Not viewed", "Viewed"]
+    }
     readStatus:{ 
         type: String,
         default: "Not viewed",
