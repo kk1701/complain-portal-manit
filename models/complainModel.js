@@ -16,7 +16,9 @@ const complainSchema = new Schema({
     },
     complainType: {
         type: String,
-        trim: true
+        trim: true,
+        enum: ["Maintenance", "Hygiene", "Security", "Mess", "Bathroom", "Room", "Noise","Other"]
+
     },
     complainDescription: {
         type: String,
@@ -34,11 +36,17 @@ const complainSchema = new Schema({
         default: "Pending",
         enum: ["Pending", "Resolved"],
     },
+    readStatus:{ 
+        type:String,
+        default:"Not viewed",
+        enum:["Not viewed","Viewed"]
+    }
 }, {
     timestamps: true
 });
 
 complainSchema.index({ studentID: 1 });
+
 
 const Complaints = model('Complaints', complainSchema);
 
