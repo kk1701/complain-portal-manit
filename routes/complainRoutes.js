@@ -4,10 +4,11 @@ import { protect } from "../middleware/protect.js";
 import { updateComplaints } from "../controllers/complainControllers.js";
 import { getComplaints } from "../controllers/complainControllers.js";
 import { deleteComplaints } from "../controllers/complainControllers.js";
+import handleFileUpload from "../middleware/uploadFile.js";
 
 const router = Router();
 //Create
-router.post("/register", protect, registerComplain);
+router.post("/register", protect, handleFileUpload, registerComplain);
 //Read
 router.get("/get-complaints", protect, getComplaints);
 //Update

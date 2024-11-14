@@ -1,4 +1,4 @@
-import appError from "../utils/appError";
+import appError from "../utils/appError.js";
 
 const logoutController = (req, res) => {
     try {
