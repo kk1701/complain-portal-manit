@@ -14,11 +14,9 @@ import { fileURLToPath } from 'url';
 dotenv.config();
 
 const app = express();
-
-
-
 app.use(express.json());
 app.use(helmet());
+
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

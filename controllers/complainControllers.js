@@ -29,7 +29,7 @@ export const registerComplain = async (req, res, next) => {
 			!complainDescription ||
 			!hostelNumber ||
 			!studentName ||
-			!scholarNumber
+			!scholarNumber 
 		) {
 			return next(new appError("Please enter all details!", 400));
 		}
@@ -83,7 +83,7 @@ export const getComplaints = async (req, res, next) => {
             return res.status(404).json({ message: "No complaints found." });
         }
 
-        // Generate full URLs for file attachments
+        
         const complaintsWithUrls = complaints.map(complaint => {
             return {
                 ...complaint._doc,
