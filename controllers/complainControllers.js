@@ -19,7 +19,10 @@ export const registerComplain = async (req, res, next) => {
 
 		// Store file paths instead of filenames
 		const attachments = req.filePaths || [];  // req.filePaths is set by the handleFileUpload middleware
-
+        const scholarNumber2 = req.sn;
+		if(scholarNumber2 !== scholarNumber){
+			return next(new appError("Invalid scholar number", 400));	
+		}
 		
 		console.log("Request body:", req.body);
 

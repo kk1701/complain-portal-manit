@@ -28,10 +28,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(csrfProtection);
-    app.use(csrfMiddleware); // Apply CSRF middleware to all routes in production
-}
 
 app.use('/ping', (req, res) => {
     res.send('pong');
@@ -49,7 +45,7 @@ app.use((err, req, res, next) => {
     }
     
     // Handle other errors
-    console.error(err); // Log the error for debugging
+    
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
     res.status(statusCode).json({
