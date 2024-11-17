@@ -38,46 +38,22 @@ const authController = async (req, res, next) => {
 			res.status(200).json({
 				success: true,
 				message: "User authenticated successfully",
-				data: {
-					user: {
-						0: {
-							type: "mail",
-							values: ["vynr1504@gmail.com"],
-						},
-						1: {
-							type: "mobile",
-							values: ["7671050452"],
-						},
-						2: {
-							type: "uid",
-							values: ["2211201152"],
-						},
-						3: {
-							type: "cn",
-							values: ["Velpucherla Yogananda Reddy"],
-						},
-						4: {
-							type: "sn",
-							values: ["Velpucherla"],
-						},
-						5: {
-							type: "departmentNumber",
-							values: ["Computer Science and Engineering"],
-						},
-						6: {
-							type: "roomNumber",
-							values: ["H5-C062"],
-						},
-						7: {
-							type: "hostel",
-							values: ["H5"],
-						},
-						role: "student",
-						complaintsRegistered: 0,
-						complaintsResolved: 0,
-						complaintsUnresolved: 0,
-					},
-				},
+				user: {
+					email: "vynr1504@gmail.com",
+					mobile: "7671050452",
+					uid: "2211201152",
+					name: "Velpucherla Yogananda Reddy",
+					lastName: "Velpucherla",
+					department: "Computer Science and Engineering",
+					room: "H5-C062",
+					hostel: "H5",
+					role: "student",
+					complaints: {
+						registered: 0,
+						resolved: 0,
+						unresolved: 0
+					}
+				}
 			});
 		}
 	} catch (err) {
