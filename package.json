@@ -6,26 +6,38 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./index.js"
+    "start": "nodemon ./index.js",
+    "doc": "jsdoc -c jsdoc-config.json",
+    "remove-docdash": "npm uninstall docdash",
+    "install-clean-jsdoc-theme": "npm install clean-jsdoc-theme --save-dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@dr.pogodin/csurf": "^1.14.1",
     "body-parser": "^1.20.3",
+    "clean-jsdoc-theme": "^4.3.0",
     "cookie-parse": "^0.4.0",
     "cookie-parser": "^1.4.7",
-    "csurf": "^1.10.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "csrf-csrf": "^3.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "ldapjs": "^3.0.7",
+    "ldapts": "^7.2.2",
     "mongoose": "^8.7.1",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7",
     "path": "^0.12.7",
     "validator": "^13.12.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.4"
   }
 }

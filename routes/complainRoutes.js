@@ -1,19 +1,57 @@
+/**
+ * @module routes/complainRoutes
+ * @file Routes for managing complaints, including registration, retrieval, updating, and deletion.
+ */
 import { Router } from "express";
-import { registerComplain } from "../controllers/complainControllers.js";
+import {
+    registerComplain,
+    updateComplaints,
+    getComplaints,
+    deleteComplaints,
+    getComplaintsByDate_main
+} from "../controllers/complainControllers.js";
 import { protect } from "../middleware/protect.js";
-import { updateComplaints } from "../controllers/complainControllers.js";
-import { getComplaints } from "../controllers/complainControllers.js";
-import { deleteComplaints } from "../controllers/complainControllers.js";
 import handleFileUpload from "../middleware/uploadFile.js";
+import dotenv from "dotenv";
+import csrfProtection from "../middleware/csrfMiddleware.js";
+dotenv.config();
+
 
 const router = Router();
-//Create
-router.post("/register", protect, handleFileUpload, registerComplain);
-//Read
-router.get("/get-complaints", protect, getComplaints);
-//Update
-router.post("/update-complaints", protect, updateComplaints);
-//Delete
-router.delete("/delete-complaints", protect, deleteComplaints);
+
+/**
+ * @route POST /register/:type
+ * @desc Register a new complaint
+ * @access Private
+ */
+router.post("/register/:type", protect,csrfProtection,handleFileUpload, registerComplain);
+
+/**
+ * @route GET /get-complaints/:type
+ * @desc Get complaints by type
+ * @access Private
+ */
+router.get("/get-complaints/:type", protect, getComplaints);
+
+/**
+ * @route GET /get-complaints-date/:type
+ * @desc Get complaints by date and type
+ * @access Private
+ */
+router.get("/get-complaints-date/:type", protect, getComplaintsByDate_main);
+
+/**
+ * @route PUT /update-complaints/:type
+ * @desc Update complaints by type
+ * @access Private
+ */
+router.put("/update-complaints/:type", protect, csrfProtection,updateComplaints);
+
+/**
+ * @route DELETE /delete-complaints/:type
+ * @desc Delete complaints by type
+ * @access Private
+ */
+router.delete("/delete-complaints/:type", protect, csrfProtection,deleteComplaints);
 
 export default router;

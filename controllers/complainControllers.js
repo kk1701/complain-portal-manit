@@ -1,62 +1,56 @@
-import Complaints from "../models/complainModel.js";
+// import Complaints from "../models/HostelComplaint.js";
 import appError from "../utils/appError.js";
 import dotenv from "dotenv";
-import validator from "validator";
-
+import { registerComplaintHostel, getComplaintsHostel ,updateComplaintHostel , deleteComplaintHostel,getComplaintsByDate} from "../controllerFunctions/hostelFunctions.js";
+import { registerComplaintAcademic,getComplaintsAcademic,getAcademicComplaintsByDate,deleteAcademicComplaint,updateAcademicComplaint } from "../controllerFunctions/academicFunctions.js";
+import { registerAdministrationComplaint,getAdministrationComplaints,getAdministrationComplaintsByDate,updateAdministrationComplaint,deleteAdministrationComplaint } from "../controllerFunctions/administrationFunctions.js";
+import { registerInfrastructureComplaint,getInfrastructureComplaints,getInfrastructureComplaintsByDate,updateInfrastructureComplaint,deleteInfrastructureComplaint } from "../controllerFunctions/infrastructureFunctions.js";
+import { registerMedicalComplaint,getMedicalComplaints,getMedicalComplaintsByDate,updateMedicalComplaint,deleteMedicalComplaint} from "../controllerFunctions/medicalFunctions.js";
+import { registerRaggingComplaint,getRaggingComplaints,getRaggingComplaintsByDate,updateRaggingComplaint,deleteRaggingComplaint } from "../controllerFunctions/raggingFunctions.js";
 // Environment variables
 dotenv.config();
 
+/**
+ * Register a complaint based on the type.
+ * @file ./controllers/complainControllers.js
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
+/**
+ * @file /d:/compliant-portal/manit-complainPortal-backend/controllers/complainControllers.js
+ * @module controllers/complainControllers
+ */
+
+ /**
+	* Registers a complaint based on the type specified in the request parameters.
+	* 
+	* @async
+	* @function registerComplain
+	* @param {Object} req - Express request object.
+	* @param {Object} res - Express response object.
+	* @param {Function} next - Express next middleware function.
+	* @throws Will throw an error if the complaint registration fails.
+	*/
 export const registerComplain = async (req, res, next) => {
 	try {
-		const {
-			complainType,
-			complainDescription,
-			hostelNumber,
-			studentName,
-			scholarNumber,
-			room,
-		} = req.body;
-
-		// Store file paths instead of filenames
-		const attachments = req.filePaths || [];  // req.filePaths is set by the handleFileUpload middleware
-
-		
-		console.log("Request body:", req.body);
-
-		// Validate required fields
-		if (
-			!complainType ||
-			!complainDescription ||
-			!hostelNumber ||
-			!studentName ||
-			!scholarNumber 
-		) {
-			return next(new appError("Please enter all details!", 400));
+		if (req.params.type === "Hostel") {
+			await registerComplaintHostel(req, res, next);
+		} else if (req.params.type === "Academic") {
+			await registerComplaintAcademic(req, res, next);
+		} else if (req.params.type === "Administration") {
+			await registerAdministrationComplaint(req, res, next);
+		} else if (req.params.type === "Infrastructure") {
+			await registerInfrastructureComplaint(req, res, next);
+		} else if (req.params.type === "Medical") {
+			await registerMedicalComplaint(req, res, next);
+		} else if (req.params.type === "Ragging") {
+			await registerRaggingComplaint(req, res, next);
 		}
-
-		// Create the complaint
-		const complain = await Complaints.create({
-			complainType,
-			complainDescription,
-			attachments, // Store the paths of the uploaded files
-			scholarNumber,
-			hostelNumber,
-			studentName,
-			room,
-		});
-
-		// Check if complaint was created successfully
-		if (!complain) {
-			return next(
-				new appError("Complaint registration failed, please try again!", 400)
-			);
+		else {
+			return next(new appError("Development phase ", 400));
 		}
-
-		// Respond to the client
-		res.status(201).json({
-			success: true,
-			message: "Complaint registered successfully!",
-		});
 	} catch (error) {
 		// Log the error for debugging
 		console.error("Error during complaint registration:", error);
@@ -66,96 +60,130 @@ export const registerComplain = async (req, res, next) => {
 	}
 };
 
-
+/**
+ * Get complaints based on the type.
+ * @file ./controllers/complainControllers.js
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const getComplaints = async (req, res, next) => {
     try {
-        const scholarNumber = validator.escape(req.query.sn); 
-
-        // Validate that scholarNumber is provided and is of expected format
-        if (!scholarNumber) {
-            return next(new appError("Scholar number is required!", 400));
-        }
-
-        // Query for complaints based on scholar number
-        const complaints = await Complaints.find({ scholarNumber });
-
-        if (!complaints || complaints.length === 0) {
-            return res.status(404).json({ message: "No complaints found." });
-        }
-
-        
-        const complaintsWithUrls = complaints.map(complaint => {
-            return {
-                ...complaint._doc,
-                attachments: complaint.attachments.map(filePath => ({
-                    url: `${req.protocol}://${req.get('host')}/${filePath}` 
-                }))
-            };
-        });
-
-        
-        return res.status(200).json({ complaints: complaintsWithUrls });
+		console.log("Request params:", req.params);
+        if (req.params.type === "Hostel") {
+			await getComplaintsHostel(req, res, next);
+		} else if (req.params.type === "Academic") {
+			await getComplaintsAcademic(req, res, next);
+		} else if (req.params.type === "Administration") {
+			await getAdministrationComplaints(req, res, next);
+		} else if (req.params.type === "Infrastructure") {
+			await getInfrastructureComplaints(req, res, next);
+		} else if (req.params.type === "Medical") {
+			await getMedicalComplaints(req, res, next);
+		} else if (req.params.type === "Ragging") {
+			await getRaggingComplaints(req, res, next);
+		}
+		else {
+			return next(new appError("Development phase ", 400));	
+		}
     } catch (error) {
         console.error("Error fetching complaints:", error);
         next(new appError("Internal server error!", 500));
     }
 };
 
+/**
+ * Get complaints by date based on the type.
+ * @file ./controllers/complainControllers.js
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
+export const getComplaintsByDate_main = async (req, res, next) => {
+	try {
+		if (req.params.type === "Hostel") {
+			await getComplaintsByDate(req, res, next);
+		} else if (req.params.type === "Academic") {
+			await getAcademicComplaintsByDate(req, res, next);
+		} else if (req.params.type === "Administration") {
+			await getAdministrationComplaintsByDate(req, res, next);
+		} else if (req.params.type === "Infrastructure") {
+			await getInfrastructureComplaintsByDate(req, res, next);
+		} else if (req.params.type === "Medical") {
+			await getMedicalComplaintsByDate(req, res, next);
+		} else if (req.params.type === "Ragging") {
+			await getRaggingComplaintsByDate(req, res, next);
+		}
+		else {
+			return next(new appError("Development phase ", 400));
+		}
+	} catch (error) {
+		console.error("Error fetching complaints:", error);
+		next(new appError("Internal server error!", 500));
+	}
+}	
+
+/**
+ * Update complaints based on the type.
+ * @file ./controllers/complainControllers.js
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const updateComplaints = async (req, res, next) => {
 	try {
-		const { updates } = req.body;
-
-		if (!Array.isArray(updates) || updates.length === 0) {
-			return next(new appError("Zero Updates", 400));
+		  if(req.params.type === "Hostel"){
+			await updateComplaintHostel(req, res, next);
+		}else if(req.params.type === "Academic"){
+			await updateAcademicComplaint(req, res, next);
+		}else if(req.params.type === "Administration"){
+			await updateAdministrationComplaint(req, res, next);
+		}else if(req.params.type === "Infrastructure"){
+			await updateInfrastructureComplaint(req, res, next);
+		}else if(req.params.type === "Medical"){
+			await updateMedicalComplaint(req, res, next);
+		}else if(req.params.type === "Ragging"){
+			await updateRaggingComplaint(req, res, next);
 		}
-
-		const bulkUpdatePromises = updates.map((update) => {
-			const { complainId, ...updateFields } = update;
-
-			if (!complainId) {
-				return Promise.reject(
-					new appError("Complain ID is required for each update!", 400)
-				);
-			}
-
-			return Complaints.findByIdAndUpdate(
-				complainId,
-				{ $set: updateFields },
-				{ new: true }
-			);
-		});
-
-		const updatedComplaints = await Promise.all(bulkUpdatePromises);
-
-		res.status(200).json({
-			success: true,
-			message: "Complaints updated successfully!",
-			data: updatedComplaints,
-		});
+		else {
+			return next(new appError("Development phase ", 400));
+		}
 	} catch (err) {
 		next(new appError("Internal server error!", 500));
 	}
 };
 
+/**
+ * Delete complaints based on the type.
+ * @file ./controllers/complainControllers.js
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const deleteComplaints = async (req, res, next) => {
 	try {
-		const { complainId } = req.query;
-		console.log("Complaint ID:", complainId);
-		if (!complainId) {
-			return next(new appError("Complain ID is required!", 400));
+		if(req.params.type === "Hostel"){
+			await deleteComplaintHostel(req, res, next);
+		}else if(req.params.type === "Academic"){
+			await deleteAcademicComplaint(req, res, next);	
+		}else if(req.params.type === "Administration"){
+			await deleteAdministrationComplaint(req, res, next);
+		}else if(req.params.type === "Infrastructure"){
+			await deleteInfrastructureComplaint(req, res, next);
+		}else if(req.params.type === "Medical"){
+			await deleteMedicalComplaint(req, res, next);
+		}else if(req.params.type === "Ragging"){
+			await deleteRaggingComplaint(req, res, next);
 		}
-
-		const deletedComplaint = await Complaints.findByIdAndDelete(complainId);
-
-		if (!deletedComplaint) {
-			return next(new appError("Complaint not found!", 404));
+		else {
+			return next(new appError("Development phase ", 400));
 		}
-
-		res.status(200).json({
-			success: true,
-			message: "Complaint deleted successfully!",
-		});
 	} catch (error) {
+		console.log(error);
 		next(new appError("Internal server error!", 500));
 	}
 };

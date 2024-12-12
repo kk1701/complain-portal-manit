@@ -1,57 +1,119 @@
+/**
+ * @file app.js
+ * @module CompliantPortalBackend
+ * @description Main application file for the Compliant Portal Backend, setting up middleware, routes, and error handling.
+ */
+import { protect } from './middleware/protect.js';
 import express from 'express';
 import complainRoutes from './routes/complainRoutes.js';
+import fs from 'fs';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import profileRoutes from './routes/profileRoutes.js';
-import csrfProtection from './utils/csrf.js';
-import csrfMiddleware from './middleware/csrfMiddleware.js';
-import appError from './utils/appError.js';
+import AppError from './utils/appError.js'; // Renamed to PascalCase
 import loginRoutes from './routes/loginRoutes.js';
 import logoutRoutes from './routes/logoutRoutes.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cors from 'cors';
+import morgan from 'morgan';
+import csrf from '@dr.pogodin/csurf';
+import csrfProtection from './middleware/csrfMiddleware.js';
+
 dotenv.config();
 
-const app = express();
-app.use(express.json());
-app.use(helmet());
+/**
+ * CORS Configuration
+ */
+const corsConfig = cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization','csrf-token']
+});
 
-// Get the directory name of the current module
+const app = express();
+
+// Apply security and parsing middlewares early
+app.use(helmet());
+// app.use(helmet.contentSecurityPolicy({
+//     directives:{
+//         defaultSrc: [" 'self' "],
+//         scriptSrc: ["'self'", "https://apis.google.com"],
+//         styleSrc: ["'self'", "https://fonts.googleapis.com"],
+//         fontSrc: ["'self'", "https://fonts.gstatic.com"],
+//         imgSrc: ["'self'", "data:"],
+//         connectSrc: ["'self'", "https://apis.google.com"],
+//         frameSrc: ["'self'", "https://accounts.google.com"],
+        
+//     }
+// }))
+app.use(morgan('dev'));
+app.use(corsConfig);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+/**
+ * Serve static files from the "uploads" directory
+ */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from the "uploads" directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-if (process.env.NODE_ENV === 'production') {
-    app.use(csrfProtection);
-    app.use(csrfMiddleware); // Apply CSRF middleware to all routes in production
-}
-
-app.use('/ping', (req, res) => {
+/**
+ * Health Check Route
+ */
+app.get('/ping', (req, res) => {
     res.send('pong');
 });
 
 // Routes
 app.use('/complain', complainRoutes);
 app.use('/profile', profileRoutes);
-app.use("/login",loginRoutes);
-app.use("/logout",logoutRoutes);
-// Error handling middleware
+app.use('/login', loginRoutes);
+app.use('/logout', logoutRoutes);
+app.use('/uploads', (req, res, next) => {
+    const filePath = path.join(__dirname, 'uploads', req.path);
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(404).json({
+                status: 'error',
+                statusCode: 404,
+                message: `Cannot find ${req.originalUrl} on this server`
+            });
+        }
+        express.static(path.join(__dirname, 'uploads'))(req, res, next);
+    });
+});
+app.get('/csrf-token', protect,csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+  });
+
+/**
+ * 404 Handler for undefined routes
+ */
+app.all('*', (req, res, next) => {
+    next(new AppError(`Cannot find ${req.originalUrl} on this server`, 404));
+});
+
+/**
+ * Error Handling Middleware
+ */
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
-        return next(new appError('Invalid CSRF token', 403));
+        return next(new AppError('Invalid CSRF token', 403));
     }
-    
-    // Handle other errors
-    console.error(err); // Log the error for debugging
+
+    // Set default status code and message
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
+
+    // Log the error
+    console.error(err);
+
+    // Send error response
     res.status(statusCode).json({
         status: 'error',
         statusCode,
