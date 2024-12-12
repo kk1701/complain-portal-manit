@@ -1,7 +1,4 @@
-// Ensures the client receives the CSRF token, which is necessary for the client to include the token in subsequent requests (e.g., in headers or form fields)
-const csrfMiddleware = (req, res, next) => {
-    // Send the CSRF token cookie with every request
-    res.cookie('XSRF-TOKEN', req.csrfToken(), { httpOnly: true, sameSite: 'Strict' });
-    next();
-}
-export default csrfMiddleware;
+import csrf from '@dr.pogodin/csurf';
+const csrfProtection = csrf({ cookie: true ,httpOnly: true, secure: false, sameSite: 'Strict' });
+
+export default csrfProtection;

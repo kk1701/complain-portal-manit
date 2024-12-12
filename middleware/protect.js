@@ -1,14 +1,23 @@
+/**
+ * @module middleware/protect
+ * @file Middleware to protect routes by verifying JWT tokens.
+ * @exports protect
+ */
+
 import { verifyToken } from "../utils/tokenUtils.js";
 import appError from "../utils/appError.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-// The protect is middleware function to protect the routes in the backend such that once the user is authenticated the request will contain the jwt cookie
-// This cookie is needed to get the access to the protected routes
-
+/**
+ * Middleware function to protect routes.
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {Function} next - Next middleware function.
+ */
 const protect = async (req, res, next) => {
 	try {
-		// Extract the token from the req
+		// Extract the token from the request cookies
 		const token = req.cookies.jwt;
 		console.log("Token:", token);
 		if (!token) {
@@ -24,6 +33,7 @@ const protect = async (req, res, next) => {
 
 		// Grant access to protected route
 		req.sn = decoded.username; // Attach the scholar number of the student to the request
+		req.em = decoded.email;
 		next();
 	} catch (err) {
 		return next(new appError("Invalid token. Please log in again!", 401));

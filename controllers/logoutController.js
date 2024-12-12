@@ -1,5 +1,22 @@
 import appError from "../utils/appError.js";
 
+/**
+ * Logout the user by clearing the session cookie.
+ * @file ./controllers/logoutController.js
+ * @module controllers/logoutController
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
+
+
+/**
+ * Controller to handle user logout.
+ * Clears the session cookie and sends a response indicating the logout status.
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void}
+ */
 const logoutController = (req, res) => {
     try {
         res.clearCookie('jwt'); // Clear the session cookie
