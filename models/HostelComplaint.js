@@ -76,6 +76,18 @@ const HostelComplaintSchema = new Schema({
         type: String,
         default: "Not viewed",
         enum: ["Not viewed", "Viewed"]
+    },
+    AdminRemarks : {
+        type: String,
+        trim: true
+    },
+    AdminAttachements : {
+        type: [String],
+        default:[],
+        trim:true
+    },
+    resolvedAt:{
+        type: Date
     }
 }, {
     timestamps: true

@@ -62,7 +62,7 @@ const registerComplaintHostel = async (req, res, next) => {
 			return next(new appError("Please enter all details!", 400));
 		}
 
-		await Complaints.create({
+		const complaint = await Complaints.create({
 			complainType,
 			complainDescription,
 			attachments,
@@ -77,6 +77,9 @@ const registerComplaintHostel = async (req, res, next) => {
 			success: true,
 			message: "Complaint registered successfully!",
 		});
+
+		await automateEmail({ category: "Hostel", complaint });
+
 	} catch (error) {
 		next(error);
 	}
@@ -157,7 +160,7 @@ const getComplaintsByDate = async (req, res, next) => {
 			scholarNumber,
 			...(startDate || endDate ? { createdAt: dateFilter } : {}),
 		});
-
+        console.log("Complaints", complaints);
 		if (!complaints || complaints.length === 0) {
 			return res.status(404).json({ message: "No complaints found." });
 		}
@@ -169,7 +172,7 @@ const getComplaintsByDate = async (req, res, next) => {
 			})),
 			category: "Hostel",
 		}));
-
+        console.log("Complaints with urls", complaintsWithUrls);
 		res.status(200).json({ complaints: complaintsWithUrls });
 	} catch (error) {
 		next(error);

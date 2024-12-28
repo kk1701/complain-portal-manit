@@ -4,7 +4,7 @@
 import AcademicComplaint from "../models/AcademicComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
-
+import { automateEmail } from "../utils/email_automator.js";
 /**
  * Registers an academic complaint.
  *
@@ -35,6 +35,7 @@ const registerComplaintAcademic = async (req, res, next) => {
 			scholarNumber,
 			department,
 			stream,
+			year,
 		} = req.body;
 
 		const attachments = req.filePaths || [];
@@ -46,9 +47,6 @@ const registerComplaintAcademic = async (req, res, next) => {
 		}
 		if (!validator.isEmail(useremail)) {
 			return next(new appError("Invalid email", 400));
-		}
-		if (scholarNumber2 !== scholarNumber) {
-			return next(new appError("Invalid scholar number", 400));
 		}
 
 		if (
@@ -62,7 +60,7 @@ const registerComplaintAcademic = async (req, res, next) => {
 			return next(new appError("Please enter all details!", 400));
 		}
 
-		await AcademicComplaint.create({
+		const complaint = await AcademicComplaint.create({
 			complainType,
 			complainDescription,
 			attachments,
@@ -70,6 +68,7 @@ const registerComplaintAcademic = async (req, res, next) => {
 			studentName,
 			department,
 			stream,
+			year,
 			useremail,
 		});
 
@@ -77,6 +76,8 @@ const registerComplaintAcademic = async (req, res, next) => {
 			success: true,
 			message: "Complaint registered successfully!",
 		});
+
+		await automateEmail({category: "Academic", complaint});
 	} catch (error) {
 		next(error);
 	}
