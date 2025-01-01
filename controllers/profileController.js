@@ -1,10 +1,13 @@
 import appError from "../utils/appError.js";
-import dataService from "../utils/dataService.js";
-import validator from "validator";
+import { generateToken } from "../utils/tokenUtils.js";
 import dotenv from "dotenv";
+import Ldap_authenticator from "../utils/Ldap_authenticator.js";
+
 dotenv.config();
 
-const dataServiceInstance = new dataService();
+const authenticator = new Ldap_authenticator(
+	process.env.LDAP_BASE_DN || "dc=dev,dc=com"
+);
 
 /**
  * Get profile details of a user.
@@ -39,4 +42,4 @@ const getProfileDetails = async (req, res, next) => {
 
 };
 
-export { getProfileDetails };
+export default authController;
