@@ -20,6 +20,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import csrf from '@dr.pogodin/csurf';
 import csrfProtection from './middleware/csrfMiddleware.js';
+import validateRoutes from './routes/validateRoutes.js';
 
 dotenv.config();
 
@@ -27,7 +28,7 @@ dotenv.config();
  * CORS Configuration
  */
 const corsConfig = cors({
-    origin: ['http://localhost:5173', 'https://s9x3g1x0-5173.inc1.devtunnels.ms'],
+    origin: ['http://localhost:5173', 'https://s9x3g1x0-5173.inc1.devtunnels.ms','http://localhost:4000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization','csrf-token']
@@ -90,6 +91,7 @@ app.use('/uploads', (req, res, next) => {
 app.get('/csrf-token', protect,csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
   });
+app.use("/validate",validateRoutes);    
 
 /**
  * 404 Handler for undefined routes

@@ -80,7 +80,7 @@ const academicComaplaint = new Schema({
         type: String,
         trim: true
     },
-    AdminAttachements : {
+    AdminAttachments : {
         type: [String],
         default:[],
         trim:true

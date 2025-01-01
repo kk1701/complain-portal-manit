@@ -1,0 +1,32 @@
+2024-12-29 22:08:42 [INFO]: Processing job for email to vynr1504@gmail.com
+2024-12-29 22:08:43 [ERROR]: Error sending email to vynr1504@gmail.com: Missing credentials for "PLAIN"
+2024-12-29 22:08:43 [INFO]: Processing job for email to vynr1504@gmail.com
+2024-12-29 22:08:44 [ERROR]: Error sending email to vynr1504@gmail.com: Missing credentials for "PLAIN"
+2024-12-29 22:08:44 [INFO]: Processing job for email to vynr1504@gmail.com
+2024-12-29 22:15:23 [INFO]: Starting automateEmail with data:
+2024-12-29 22:15:23 [INFO]: Preparing email for vynr1504@gmail.com
+2024-12-29 22:15:23 [INFO]: Adding email job to the queue 67717ca3962ac365fdf2a0b5
+2024-12-29 22:15:24 [INFO]: Processing job for email to vynr1504@gmail.com
+2024-12-29 22:15:28 [INFO]: Email successfully sent to vynr1504@gmail.com
+2025-01-01 11:03:58 [INFO]: Processing job for email to vynr1504@gmail.com
+2025-01-01 11:04:02 [INFO]: Email successfully sent to vynr1504@gmail.com
+2025-01-01 11:06:44 [INFO]: Processing job for email to vynr1504@gmail.com
+2025-01-01 11:06:48 [INFO]: Email successfully sent to vynr1504@gmail.com
+2025-01-01 12:25:58 [INFO]: Starting automateEmail with data:
+2025-01-01 12:25:58 [INFO]: Preparing email for vynr1504@gmail.com
+2025-01-01 12:25:58 [INFO]: Adding email job to the queue 6774e6fef9ea83027d559dfc
+2025-01-01 12:25:59 [INFO]: Processing job for email to vynr1504@gmail.com
+2025-01-01 12:26:02 [INFO]: Email successfully sent to vynr1504@gmail.com
+2025-01-01 16:48:03 [INFO]: Starting automateEmail with data:
+2025-01-01 16:48:03 [INFO]: Preparing email for vynr1504@gmail.com
+2025-01-01 16:48:03 [INFO]: Adding email job to the queue 6775246b46ef008e45dd6b1b
+2025-01-01 16:48:04 [INFO]: Processing job for email to vynr1504@gmail.com
+2025-01-01 16:48:08 [INFO]: Email successfully sent to vynr1504@gmail.com
+2025-01-01 17:32:26 [INFO]: Starting automateEmail with data:
+2025-01-01 17:32:26 [INFO]: Adding email job to the queue 67752ed16fd0b1e331a37a75
+2025-01-01 17:32:26 [INFO]: Processing job for email to vynr1504@gmail.com
+2025-01-01 17:32:30 [INFO]: Email successfully sent to vynr1504@gmail.com
+2025-01-01 19:32:15 [INFO]: Starting automateEmail with data:
+2025-01-01 19:32:16 [INFO]: Adding email job to the queue 67754ae71f5e43e48a9f995b
+2025-01-01 19:32:16 [INFO]: Processing job for email to vynr1504@gmail.com
+2025-01-01 19:32:20 [INFO]: Email successfully sent to vynr1504@gmail.com

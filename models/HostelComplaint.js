@@ -79,9 +79,10 @@ const HostelComplaintSchema = new Schema({
     },
     AdminRemarks : {
         type: String,
+        default: "",
         trim: true
     },
-    AdminAttachements : {
+    AdminAttachments : {
         type: [String],
         default:[],
         trim:true

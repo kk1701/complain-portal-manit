@@ -4,6 +4,7 @@
 import Complaints from "../models/HostelComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
+import { automateEmail } from "../utils/email_automator.js";
 
 /**
  * Registers a hostel complaint.

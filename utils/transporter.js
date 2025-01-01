@@ -16,10 +16,10 @@ dotenv.config();
  */
 const transporter = nodemailer.createTransport({
     service: "gmail",
-    auth:{
-        user:process.env.EMAIL_USER,
-        pass:process.env.EMAIL_PASS, // Updated to use environment variable
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
     },
+  
 });
-
 export default transporter;
