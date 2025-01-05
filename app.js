@@ -13,6 +13,7 @@ import profileRoutes from './routes/profileRoutes.js';
 import AppError from './utils/appError.js'; // Renamed to PascalCase
 import loginRoutes from './routes/loginRoutes.js';
 import logoutRoutes from './routes/logoutRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -92,7 +93,7 @@ app.get('/csrf-token', protect,csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
   });
 app.use("/validate",validateRoutes);    
-
+app.use('/feedback', feedbackRoutes);
 /**
  * 404 Handler for undefined routes
  */
@@ -121,6 +122,7 @@ app.use((err, req, res, next) => {
         statusCode,
         message
     });
+    return; // Ensure the response is sent only once
 });
 
 export default app;

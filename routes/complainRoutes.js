@@ -11,6 +11,8 @@ import {
     getComplaintsByDate_main
 } from "../controllers/complainControllers.js";
 import { protect } from "../middleware/protect.js";
+import {searchController} from "../controllers/searchController.js";
+
 import handleFileUpload from "../middleware/uploadFile.js";
 import dotenv from "dotenv";
 import csrfProtection from "../middleware/csrfMiddleware.js";
@@ -53,5 +55,5 @@ router.put("/update-complaints/:type", protect,csrfProtection,updateComplaints);
  * @access Private
  */
 router.delete("/delete-complaints/:type", protect,csrfProtection,deleteComplaints);
-
+router.get("/search/:type",protect,searchController);
 export default router;

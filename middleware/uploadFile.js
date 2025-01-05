@@ -51,7 +51,7 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
     fileFilter: fileFilter,
-}).array("attachments", 5);
+}).any(); // Changed from .array("attachments", 5) to .any()
 
 /**
  * Middleware for handling file uploads.

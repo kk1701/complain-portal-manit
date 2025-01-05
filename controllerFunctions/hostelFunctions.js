@@ -171,6 +171,9 @@ const getComplaintsByDate = async (req, res, next) => {
 			attachments: complaint.attachments.map((filePath) => ({
 				url: `${req.protocol}://${req.get("host")}/${filePath}`,
 			})),
+			AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
 			category: "Hostel",
 		}));
         console.log("Complaints with urls", complaintsWithUrls);
