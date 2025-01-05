@@ -4,7 +4,7 @@
 import AdministrationComplaint from "../models/AdministrationComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
-
+import { automateEmail } from "../utils/email_automator.js";
 /**
  * Registers a new administration complaint.
  * @param {Object} req - The request object.
@@ -19,6 +19,8 @@ const registerAdministrationComplaint = async (req, res, next) => {
 			studentName,
 			scholarNumber,
 			department,
+			stream,
+			year
 		} = req.body;
 
 		const attachments = req.filePaths || [];
@@ -46,7 +48,7 @@ const registerAdministrationComplaint = async (req, res, next) => {
 			return next(new appError("Please enter all details!", 400));
 		}
 
-		await AdministrationComplaint.create({
+		const complaint = await AdministrationComplaint.create({
 			complainType,
 			complainDescription,
 			attachments,
@@ -54,12 +56,16 @@ const registerAdministrationComplaint = async (req, res, next) => {
 			studentName,
 			department,
 			useremail,
+			stream,
+			year
 		});
 
 		res.status(201).json({
 			success: true,
 			message: "Complaint registered successfully!",
 		});
+
+		await automateEmail({ category: "Administration", complaint });
 	} catch (error) {
 		next(error);
 	}
@@ -84,6 +90,9 @@ const getAdministrationComplaints = async (req, res, next) => {
 		const complaintsWithUrls = complaints.map((complaint) => ({
 			...complaint._doc,
 			attachments: complaint.attachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
+			AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
 				url: `${req.protocol}://${req.get("host")}/${filePath}`,
 			})),
 			category: "Administration",

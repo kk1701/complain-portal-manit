@@ -4,6 +4,7 @@
 import Complaints from "../models/HostelComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
+import { automateEmail } from "../utils/email_automator.js";
 
 /**
  * Registers a hostel complaint.
@@ -62,7 +63,7 @@ const registerComplaintHostel = async (req, res, next) => {
 			return next(new appError("Please enter all details!", 400));
 		}
 
-		await Complaints.create({
+		const complaint = await Complaints.create({
 			complainType,
 			complainDescription,
 			attachments,
@@ -77,6 +78,9 @@ const registerComplaintHostel = async (req, res, next) => {
 			success: true,
 			message: "Complaint registered successfully!",
 		});
+
+		await automateEmail({ category: "Hostel", complaint });
+
 	} catch (error) {
 		next(error);
 	}
@@ -157,7 +161,7 @@ const getComplaintsByDate = async (req, res, next) => {
 			scholarNumber,
 			...(startDate || endDate ? { createdAt: dateFilter } : {}),
 		});
-
+        console.log("Complaints", complaints);
 		if (!complaints || complaints.length === 0) {
 			return res.status(404).json({ message: "No complaints found." });
 		}
@@ -167,9 +171,12 @@ const getComplaintsByDate = async (req, res, next) => {
 			attachments: complaint.attachments.map((filePath) => ({
 				url: `${req.protocol}://${req.get("host")}/${filePath}`,
 			})),
+			AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
 			category: "Hostel",
 		}));
-
+        console.log("Complaints with urls", complaintsWithUrls);
 		res.status(200).json({ complaints: complaintsWithUrls });
 	} catch (error) {
 		next(error);

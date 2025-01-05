@@ -4,7 +4,7 @@
 import InfrastructureComplaint from "../models/InfrastructureComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
-
+import { automateEmail } from "../utils/email_automator.js";
 /**
  * Registers an infrastructure complaint.
  *
@@ -61,7 +61,7 @@ const registerInfrastructureComplaint = async (req, res, next) => {
 			return next(new appError("Please enter all details!", 400));
 		}
 
-		await InfrastructureComplaint.create({
+		const complaint = await InfrastructureComplaint.create({
 			complainType,
 			complainDescription,
 			attachments,
@@ -75,6 +75,9 @@ const registerInfrastructureComplaint = async (req, res, next) => {
 			success: true,
 			message: "Complaint registered successfully!",
 		});
+
+        automateEmail({ category: "Infrastructure", complaint });
+
 	} catch (error) {
 		next(error);
 	}
@@ -105,6 +108,9 @@ const getInfrastructureComplaints = async (req, res, next) => {
 		const complaintsWithUrls = complaints.map((complaint) => ({
 			...complaint._doc,
 			attachments: complaint.attachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
+			AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
 				url: `${req.protocol}://${req.get("host")}/${filePath}`,
 			})),
 			category: "Infrastructure",

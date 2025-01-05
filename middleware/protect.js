@@ -36,7 +36,7 @@ const protect = async (req, res, next) => {
 		req.em = decoded.email;
 		next();
 	} catch (err) {
-		return next(new appError("Invalid token. Please log in again!", 401));
+		return res.status(401).json({expired:true,message:"Session Expired",});
 	}
 };
 

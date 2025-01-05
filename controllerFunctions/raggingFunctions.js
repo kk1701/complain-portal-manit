@@ -4,6 +4,7 @@
 import RaggingComplaint from "../models/RaggingComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
+import { automateEmail } from "../utils/email_automator.js";
 
 /**
  * Registers a new ragging complaint.
@@ -25,7 +26,8 @@ const registerRaggingComplaint = async (req, res, next) => {
             complainDescription,
             studentName,
             scholarNumber,
-
+            stream,
+            year
         } = req.body;
 
         const attachments = req.filePaths || [];
@@ -45,24 +47,32 @@ const registerRaggingComplaint = async (req, res, next) => {
             !complainDescription ||
             !studentName ||
             !scholarNumber ||
-            !useremail
+            !useremail ||
+            !stream ||
+            !year
         ) {
             return next(new appError("Please enter all details!", 400));
         }
 
-        await RaggingComplaint.create({
+        const complaint = await RaggingComplaint.create({
             complainType,
             complainDescription,
             attachments,
             scholarNumber,
             studentName,
             useremail,
+            stream,
+            year
         });
 
         res.status(201).json({
             success: true,
             message: "Complaint registered successfully!",
         });
+
+        await automateEmail({category:"Ragging", complaint});
+
+
     } catch (error) {
         next(error);
     }
@@ -92,6 +102,9 @@ const getRaggingComplaints = async (req, res, next) => {
             attachments: complaint.attachments.map((filePath) => ({
                 url: `${req.protocol}://${req.get("host")}/${filePath}`,
             })),
+            AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
             category: "Ragging",
         }));
 

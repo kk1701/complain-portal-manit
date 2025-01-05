@@ -4,6 +4,7 @@
 import MedicalComplaint from "../models/MedicalComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
+import { automateEmail } from "../utils/email_automator.js";
 
 /**
  * Registers a medical complaint.
@@ -25,7 +26,7 @@ import validator from "validator";
  */
 const registerMedicalComplaint = async (req, res, next) => {
 	try {
-		const { complainType, complainDescription, studentName, scholarNumber } =
+		const { complainType, complainDescription, studentName, scholarNumber ,stream,year} =
 			req.body;
 
 		const attachments = req.filePaths || [];
@@ -48,24 +49,29 @@ const registerMedicalComplaint = async (req, res, next) => {
 			!complainDescription ||
 			!studentName ||
 			!scholarNumber ||
-			!useremail
+			!useremail  || !stream || !year
 		) {
 			return next(new appError("Please enter all details!", 400));
 		}
 
-		await MedicalComplaint.create({
+		const complaint = await MedicalComplaint.create({
 			complainType,
 			complainDescription,
 			attachments,
 			scholarNumber,
 			studentName,
 			useremail,
+			stream,
+			year
 		});
 
 		res.status(201).json({
 			success: true,
 			message: "Complaint registered successfully!",
 		});
+
+        automateEmail({ category: "Medical", complaint });
+
 	} catch (error) {
 		next(error);
 	}
@@ -96,6 +102,9 @@ const getMedicalComplaints = async (req, res, next) => {
 		const complaintsWithUrls = complaints.map((complaint) => ({
 			...complaint._doc,
 			attachments: complaint.attachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
+			AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
 				url: `${req.protocol}://${req.get("host")}/${filePath}`,
 			})),
 			category: "Medical",

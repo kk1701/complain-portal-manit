@@ -1,7 +1,7 @@
 /**
  * @file Data Service module for handling LDAP and complaint data.
  * @module utils/DataService
- */
+*/
 import HostelComplaint from "../models/HostelComplaint.js";
 import AcademicComplaint from "../models/AcademicComplaint.js";
 import AdministrationComplaint from "../models/AdministrationComplaint.js";
@@ -12,6 +12,7 @@ import appError from "./appError.js";
 import validator from "validator";
 import dotenv from "dotenv";
 import ldap from "ldapjs";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -155,6 +156,9 @@ class DataService {
      * @returns {Promise<Object>} - A promise that resolves to the complaint details.
      */
     async getComplaintDetails(scholarNumber) {
+        if (mongoose.connection.readyState !== 1) {
+            await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/test");
+        }
         try {
            const [
             hostelComplaints,
@@ -194,7 +198,13 @@ class DataService {
             return {
                 registered: complaints.length,
                 resolved: resolvedComplaints,
-                unresolved: unresolvedComplaints
+                unresolved: unresolvedComplaints,
+                hostel:hostelComplaints.length,
+                academic:academicConplaints.length,
+                administration:administrationComplaints.length,
+                infrastructure:infrastructureComplaints.length,
+                medical:medicalComplaints.length,
+                ragging:raggingComplaints.length
             };
         } catch (error) {
             console.error("Error fetching complaints:", error);
