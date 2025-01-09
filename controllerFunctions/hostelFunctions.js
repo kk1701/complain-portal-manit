@@ -5,6 +5,7 @@ import Complaints from "../models/HostelComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
 import { automateEmail } from "../utils/email_automator.js";
+import mongoose from "mongoose";
 
 /**
  * Registers a hostel complaint.
@@ -46,9 +47,6 @@ const registerComplaintHostel = async (req, res, next) => {
 		}
 		if (!validator.isEmail(useremail)) {
 			return next(new appError("Invalid email", 400));
-		}
-		if (scholarNumber2 !== scholarNumber) {
-			return next(new appError("Invalid scholar number", 400));
 		}
 
 		if (
@@ -144,6 +142,13 @@ const getComplaintsByDate = async (req, res, next) => {
 		const { startDate, endDate } = req.query;
 		console.log("Start date:", startDate);
 		console.log("End date:", endDate);
+		const { complaintType, status, readStatus } = req.query;
+		let complaintIds = req.query.complaintIds || [];
+		
+		if (typeof complaintIds === 'string') {
+			complaintIds = complaintIds.split(',').map(id => id.trim());
+		}
+		// ComplaintIds is an array of strings which has MongoDB complaintIds
 
 		if (!scholarNumber) {
 			return next(new appError("Scholar number is required!", 400));
@@ -157,11 +162,26 @@ const getComplaintsByDate = async (req, res, next) => {
 			dateFilter.$lte = new Date(endDate);
 		}
 
-		const complaints = await Complaints.find({
+		const filter = {
 			scholarNumber,
 			...(startDate || endDate ? { createdAt: dateFilter } : {}),
-		});
-        console.log("Complaints", complaints);
+		};
+
+		if (complaintIds.length > 0) {
+			filter._id = { $in: complaintIds.map(id => new mongoose.Types.ObjectId(id)) };
+		}
+		if (complaintType) {
+			filter.complainType = complaintType;
+		}
+		if (status) {
+			filter.status = status;
+		}
+		if (readStatus) {
+			filter.readStatus = readStatus;
+		}
+
+		const complaints = await Complaints.find(filter);
+		console.log("Complaints", complaints);
 		if (!complaints || complaints.length === 0) {
 			return res.status(404).json({ message: "No complaints found." });
 		}
@@ -176,7 +196,7 @@ const getComplaintsByDate = async (req, res, next) => {
 			})),
 			category: "Hostel",
 		}));
-        console.log("Complaints with urls", complaintsWithUrls);
+		console.log("Complaints with urls", complaintsWithUrls);
 		res.status(200).json({ complaints: complaintsWithUrls });
 	} catch (error) {
 		next(error);
