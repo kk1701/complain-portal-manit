@@ -22,6 +22,7 @@ import mongoose from "mongoose";
  */
 const registerRaggingComplaint = async (req, res, next) => {
     try {
+        console.log(req.body);
         const {
             complainType,
             complainDescription,
@@ -44,7 +45,7 @@ const registerRaggingComplaint = async (req, res, next) => {
         }
 
         if (
-            !complainType ||
+            
             !complainDescription ||
             !studentName ||
             !scholarNumber ||
