@@ -73,6 +73,7 @@ class DataService {
             room: attrMap.roomNumber,
             hostel: attrMap.roomNumber?.split("-")[0],
             stream: attrMap.ou,
+            postalAddress:attrMap.postalAddress,
             role: "student"
         };
     }
@@ -97,7 +98,8 @@ class DataService {
                     "mobile",
                     "roomNumber",
                     "departmentNumber",
-                    "ou"
+                    "ou",
+                    "postalAddress"
                 ],
             };
 

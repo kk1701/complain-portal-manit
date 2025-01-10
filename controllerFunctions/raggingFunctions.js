@@ -5,6 +5,7 @@ import RaggingComplaint from "../models/RaggingComplaint.js";
 import appError from "../utils/appError.js";
 import validator from "validator";
 import { automateEmail } from "../utils/email_automator.js";
+import mongoose from "mongoose";
 
 /**
  * Registers a new ragging complaint.
@@ -21,6 +22,7 @@ import { automateEmail } from "../utils/email_automator.js";
  */
 const registerRaggingComplaint = async (req, res, next) => {
     try {
+        console.log(req.body);
         const {
             complainType,
             complainDescription,
@@ -43,7 +45,7 @@ const registerRaggingComplaint = async (req, res, next) => {
         }
 
         if (
-            !complainType ||
+            
             !complainDescription ||
             !studentName ||
             !scholarNumber ||
@@ -128,42 +130,70 @@ const getRaggingComplaints = async (req, res, next) => {
  */
 const getRaggingComplaintsByDate = async (req, res, next) => {
     try {
-        const scholarNumber = validator.escape(req.sn);
-        const { startDate, endDate } = req.query;
+		const scholarNumber = validator.escape(req.sn);
+		console.log("Query ", req.query);
+		const { startDate, endDate } = req.query;
+		console.log("Start date:", startDate);
+		console.log("End date:", endDate);
+		const { complaintType, status, readStatus } = req.query;
+		let complaintIds = req.query.complaintIds || [];
+		
+		if (typeof complaintIds === 'string') {
+			complaintIds = complaintIds.split(',').map(id => id.trim());
+		}
+		// ComplaintIds is an array of strings which has MongoDB complaintIds
 
-        if (!scholarNumber) {
-            return next(new appError("Scholar number is required!", 400));
-        }
+		if (!scholarNumber) {
+			return next(new appError("Scholar number is required!", 400));
+		}
 
-        const dateFilter = {};
-        if (startDate) {
-            dateFilter.$gte = new Date(startDate);
-        }
-        if (endDate) {
-            dateFilter.$lte = new Date(endDate);
-        }
+		const dateFilter = {};
+		if (startDate) {
+			dateFilter.$gte = new Date(startDate);
+		}
+		if (endDate) {
+			dateFilter.$lte = new Date(endDate);
+		}
 
-        const complaints = await RaggingComplaint.find({
-            scholarNumber,
-            ...(startDate || endDate ? { createdAt: dateFilter } : {}),
-        });
+		const filter = {
+			scholarNumber,
+			...(startDate || endDate ? { createdAt: dateFilter } : {}),
+		};
 
-        if (!complaints || complaints.length === 0) {
-            return res.status(404).json({ message: "No complaints found." });
-        }
+		if (complaintIds.length > 0) {
+			filter._id = { $in: complaintIds.map(id => new mongoose.Types.ObjectId(id)) };
+		}
+		if (complaintType) {
+			filter.complainType = complaintType;
+		}
+		if (status) {
+			filter.status = status;
+		}
+		if (readStatus) {
+			filter.readStatus = readStatus;
+		}
 
-        const complaintsWithUrls = complaints.map((complaint) => ({
-            ...complaint._doc,
-            attachments: complaint.attachments.map((filePath) => ({
-                url: `${req.protocol}://${req.get("host")}/${filePath}`,
-            })),
-            category : "Ragging"
-        }));
+		const complaints = await Complaints.find(filter);
+		console.log("Complaints", complaints);
+		if (!complaints || complaints.length === 0) {
+			return res.status(404).json({ message: "No complaints found." });
+		}
 
-        res.status(200).json({ complaints: complaintsWithUrls });
-    } catch (error) {
-        next(error);
-    }
+		const complaintsWithUrls = complaints.map((complaint) => ({
+			...complaint._doc,
+			attachments: complaint.attachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
+			AdminAttachments: complaint.AdminAttachments.map((filePath) => ({
+				url: `${req.protocol}://${req.get("host")}/${filePath}`,
+			})),
+			category: "Ragging",
+		}));
+		console.log("Complaints with urls", complaintsWithUrls);
+		res.status(200).json({ complaints: complaintsWithUrls });
+	} catch (error) {
+		next(error);
+	}
 };
 
 /**

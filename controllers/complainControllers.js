@@ -70,6 +70,7 @@ export const registerComplain = async (req, res, next) => {
  */
 export const getComplaints = async (req, res, next) => {
     try {
+
 		console.log("Request params:", req.params);
         if (req.params.type === "Hostel") {
 			await getComplaintsHostel(req, res, next);
@@ -103,6 +104,9 @@ export const getComplaints = async (req, res, next) => {
  */
 export const getComplaintsByDate_main = async (req, res, next) => {
 	try {
+		if(new Date(req.query.startDate) >new Date(req.query.endDate)){
+              return next(new appError("Start date should be less than end date", 400));
+		}
 		if (req.params.type === "Hostel") {
 			await getComplaintsByDate(req, res, next);
 		} else if (req.params.type === "Academic") {

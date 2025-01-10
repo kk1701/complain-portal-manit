@@ -253,7 +253,9 @@ const generateEmailContent = (complaint, category, submittedDate) => {
                     margin: 0;
                     font-size: 16px;
                     opacity: 0.9;
-                ">Complaint ID: <strong>#${complaint._id}</strong></p>
+                ">
+                    Complaint UID: <strong>${getCategoryTag(category)}${complaint._id}</strong>
+                </p>
             </div>
             
             <!-- Personalized Greeting -->
@@ -450,4 +452,16 @@ export const automateEmail = async (data) => {
         logger.error("Email automation failed:", error);
         throw error;
     }
+};
+
+const getCategoryTag = (category) => {
+    const map = {
+        'academic': 'A',
+        'administration': 'B',
+        'hostel': 'C',
+        'infrastructure': 'D',
+        'medical': 'E',
+        'ragging': 'F'
+    };
+    return map[category.toLowerCase()] || '';
 };
